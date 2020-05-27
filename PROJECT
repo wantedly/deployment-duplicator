@@ -1,0 +1,3 @@
+domain: k8s.wantedly.com
+repo: github.com/wantedly/deployment-duplicator
+version: "2"
