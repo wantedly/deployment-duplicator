@@ -17,6 +17,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -25,11 +26,30 @@ import (
 
 // DeploymentCopySpec defines the desired state of DeploymentCopy
 type DeploymentCopySpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// labels in `CustomLabels` and those of `TargetDeploymentName` will be merged.
+	// When both have same keys, values in `Labels` will be applied
+	// This will also used for `Spec.Template.Labels` and `Spec.Selector.MatchLabels` of copied Deployment
+	CustomLabels map[string]string `json:"customLabels,omitempty"`
 
-	// Foo is an example field of DeploymentCopy. Edit DeploymentCopy_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// annotations in `CustomAnnotations` and those of `TargetDeploymentName` will be merged.
+	// When both have same keys, values in `Labels` will be applied
+	CustomAnnotations map[string]string `json:"customAnnotations,omitempty"`
+
+	// name defined in `TargetDeploymentName` will be copied
+	TargetDeploymentName string `json:"targetDeploymentName"`
+
+	// (optional) if defined, the copied deployment will have the specified Hostname
+	Hostname string `json:"hostname"`
+
+	// name defined in `TargetDeploymentName` will be copied
+	TargetContainers []Container `json:"targetContainers"`
+}
+
+// Container should be compatible with "k8s.io/api/apps/v1".Container, so that we can support more fields later on
+type Container struct {
+	Name  string `json:"name"`
+	Image string `json:"image"`
+	Env   []v1.EnvVar
 }
 
 // DeploymentCopyStatus defines the observed state of DeploymentCopy

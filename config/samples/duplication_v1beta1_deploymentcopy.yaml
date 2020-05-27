@@ -3,5 +3,18 @@ kind: DeploymentCopy
 metadata:
   name: deploymentcopy-sample
 spec:
-  # Add fields here
-  foo: bar
+  targetDeploymentName: foo
+  customLabels:
+    canary: "true"
+  hostname: "hostname"
+  targetContainers:
+    - name: nginx
+      image: nginx:latest
+      env:
+      - name: CANARY_ENABLED
+        value: "1"
+    - name: redis
+      image: redis:5.0.5
+      env:
+      - name: CANARY_ENABLED
+        value: "1"
