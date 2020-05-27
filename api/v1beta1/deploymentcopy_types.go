@@ -47,9 +47,9 @@ type DeploymentCopySpec struct {
 
 // Container should be compatible with "k8s.io/api/apps/v1".Container, so that we can support more fields later on
 type Container struct {
-	Name  string `json:"name"`
-	Image string `json:"image"`
-	Env   []v1.EnvVar
+	Name  string      `json:"name"`
+	Image string      `json:"image"`
+	Env   []v1.EnvVar `json:"env"`
 }
 
 // DeploymentCopyStatus defines the observed state of DeploymentCopy
