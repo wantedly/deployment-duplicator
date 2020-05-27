@@ -46,6 +46,8 @@ type DeploymentCopyReconciler struct {
 
 // +kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get;update;patch
 
 func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Fetch the DeploymentCopy instance
