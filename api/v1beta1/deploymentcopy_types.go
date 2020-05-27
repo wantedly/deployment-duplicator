@@ -41,6 +41,10 @@ type DeploymentCopySpec struct {
 	// (optional) if defined, the copied deployment will have the specified Hostname
 	Hostname string `json:"hostname"`
 
+	// (optional) if defined, the copied deployment will have suffix with this value.
+	// When not defined, `.Matadata.Name` will be used
+	NameSuffix string `json:"nameSuffix"`
+
 	// name defined in `TargetDeploymentName` will be copied
 	TargetContainers []Container `json:"targetContainers"`
 }
