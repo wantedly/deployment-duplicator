@@ -6,7 +6,6 @@ spec:
   targetDeploymentName: foo
   customLabels:
     canary: "true"
-  nameSuffix: "canary"
   hostname: "hostname"
   targetContainers:
     - name: nginx

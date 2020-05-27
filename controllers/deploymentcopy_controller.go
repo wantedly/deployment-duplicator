@@ -112,7 +112,7 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	}
 	copiedDeploy := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
+			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Name),
 			Namespace:   instance.Namespace,
 			Labels:      labels,
 			Annotations: annotations,

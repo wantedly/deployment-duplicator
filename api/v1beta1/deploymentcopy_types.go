@@ -38,9 +38,6 @@ type DeploymentCopySpec struct {
 	// name defined in `TargetDeploymentName` will be copied
 	TargetDeploymentName string `json:"targetDeploymentName"`
 
-	// the copied deployment name will be `<TargetDeploymentName>-<NameSuffix>`
-	NameSuffix string `json:"nameSuffix"`
-
 	// (optional) if defined, the copied deployment will have the specified Hostname
 	Hostname string `json:"hostname"`
 
