@@ -1,3 +1,7 @@
 domain: k8s.wantedly.com
 repo: github.com/wantedly/deployment-duplicator
+resources:
+- group: duplication
+  kind: DeploymentCopy
+  version: v1beta1
 version: "2"
