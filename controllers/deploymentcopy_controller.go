@@ -60,6 +60,10 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		return reconcile.Result{}, err
 	}
 
+	if instance.Spec.NameSuffix == "" {
+		instance.Spec.NameSuffix = instance.Name
+	}
+
 	// TODO(munisystem): Set a status into the DeploymentCopy resource if the target deployment doesn't exist
 	target, err := r.getDeployment(instance.Spec.TargetDeploymentName, instance.Namespace)
 	if err != nil {
@@ -114,7 +118,7 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	}
 	copiedDeploy := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Name),
+			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
 			Namespace:   instance.Namespace,
 			Labels:      labels,
 			Annotations: annotations,
