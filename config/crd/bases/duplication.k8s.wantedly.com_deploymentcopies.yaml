@@ -53,6 +53,16 @@ spec:
               description: (optional) if defined, the copied deployment will have
                 the specified Hostname
               type: string
+            nameSuffix:
+              description: (optional) if defined, the copied deployment will have
+                suffix with this value. When not defined, `.Matadata.Name` will be
+                used
+              type: string
+            replicas:
+              description: If non-zero, Replicas will be used for replicas for the
+                copied deployment
+              format: int32
+              type: integer
             targetContainers:
               description: name defined in `TargetDeploymentName` will be copied
               items:
@@ -181,6 +191,8 @@ spec:
               type: string
           required:
           - hostname
+          - nameSuffix
+          - replicas
           - targetContainers
           - targetDeploymentName
           type: object
