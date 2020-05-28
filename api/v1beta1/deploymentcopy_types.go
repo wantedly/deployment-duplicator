@@ -36,7 +36,7 @@ type DeploymentCopySpec struct {
 	CustomAnnotations map[string]string `json:"customAnnotations,omitempty"`
 
 	// If non-zero, Replicas will be used for replicas for the copied deployment
-	Replicas int `json:"replicas"`
+	Replicas int32 `json:"replicas"`
 
 	// name defined in `TargetDeploymentName` will be copied
 	TargetDeploymentName string `json:"targetDeploymentName"`

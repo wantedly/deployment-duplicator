@@ -61,6 +61,7 @@ spec:
             replicas:
               description: If non-zero, Replicas will be used for replicas for the
                 copied deployment
+              format: int32
               type: integer
             targetContainers:
               description: name defined in `TargetDeploymentName` will be copied

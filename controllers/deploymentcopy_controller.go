@@ -78,6 +78,9 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	if instance.Spec.Hostname != "" {
 		spec.Template.Spec.Hostname = instance.Spec.Hostname
 	}
+	if instance.Spec.Replicas != 0 {
+		spec.Replicas = &instance.Spec.Replicas
+	}
 
 	// Inject labels data into copied Deployment
 	labels := map[string]string{}
