@@ -1,7 +1,7 @@
 apiVersion: duplication.k8s.wantedly.com/v1beta1
 kind: DeploymentCopy
 metadata:
-  name: deploymentcopy-sample
+  name: canary
 spec:
   targetDeploymentName: foo
   customLabels:
