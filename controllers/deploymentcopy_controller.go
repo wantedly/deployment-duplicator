@@ -155,5 +155,6 @@ func (r *DeploymentCopyReconciler) getDeployment(name, namespace string) (*appsv
 func (r *DeploymentCopyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&duplicationv1beta1.DeploymentCopy{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }
