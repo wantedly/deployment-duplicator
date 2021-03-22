@@ -38,9 +38,33 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 
 	testcases := []testcase{
 		{
-			name:         "do nothing",
-			explanation:  "",
+			name:         "no resources",
+			explanation:  "do nothing",
 			initialState: nil,
+		},
+		{
+			name:        "only deployment copy",
+			explanation: "do nothing because there's no deployment",
+			initialState: []runtime.Object{
+				ut.GenDeploymentCopy("some-deployment-copy", "some-deployment", ut.AddTargetContainer("some-container", "some-image-tag")),
+			},
+		},
+		{
+			name:        "one deployment one deployment copy",
+			explanation: "should make a copy",
+			initialState: []runtime.Object{
+				ut.GenDeployment("some-deployment", map[string]string{"app": "some-app", "role": "web"}, ut.AddContainer("some-container", "some-image-tag")),
+				ut.GenDeploymentCopy("some-deployment-copy", "some-deployment", ut.AddTargetContainer("some-container", "another-image-tag")),
+			},
+		},
+		{
+			name:        "copied deployment exists",
+			explanation: "should update it, therefore it can't update",
+			initialState: []runtime.Object{
+				ut.GenDeployment("some-deployment", map[string]string{"app": "some-app", "role": "web"}, ut.AddContainer("some-container", "some-image-tag")),
+				ut.GenDeployment("some-deployment-some-deployment-copy", map[string]string{"app": "some-app", "role": "web"}, ut.AddContainer("some-container", "other-image-tag")),
+				ut.GenDeploymentCopy("some-deployment-copy", "some-deployment", ut.AddTargetContainer("some-container", "another-image-tag")),
+			},
 		},
 	}
 
@@ -57,7 +81,7 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 			ctx := context.Background()
 			nn := types.NamespacedName{
 				Namespace: "some-namespace",
-				Name:      "some-identifier",
+				Name:      "some-deployment-copy",
 			}
 			req := ctrl.Request{NamespacedName: nn}
 			if _, err := rec.Reconcile(req); err != nil {
