@@ -3,17 +3,18 @@ package testing
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/pkg/errors"
-	ddv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
 	"gopkg.in/yaml.v2"
-	appsv1 "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
+	"github.com/pkg/errors"
 	"github.com/stuart-warren/yamlfmt"
+	appsv1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	ddv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
 )
 
 type deploymentOption func(*appsv1.Deployment)
@@ -51,9 +52,6 @@ func GenDeployment(name string, labels map[string]string, opts ...deploymentOpti
 
 func AddContainer(name, image string) deploymentOption {
 	return func(d *appsv1.Deployment) {
-		if d.Spec.Template.Spec.Containers == nil {
-			d.Spec.Template.Spec.Containers = []v1.Container{}
-		}
 		d.Spec.Template.Spec.Containers = append(d.Spec.Template.Spec.Containers, v1.Container{Name: name, Image: image})
 	}
 }
@@ -79,9 +77,6 @@ func GenDeploymentCopy(name string, targetDeployment string, opts ...deploymentC
 }
 func AddTargetContainer(name, image string) deploymentCopyOption {
 	return func(dc *ddv1beta1.DeploymentCopy) {
-		if dc.Spec.TargetContainers == nil {
-			dc.Spec.TargetContainers = []ddv1beta1.Container{}
-		}
 		dc.Spec.TargetContainers = append(dc.Spec.TargetContainers, ddv1beta1.Container{
 			Name:  name,
 			Image: image,
