@@ -2,18 +2,18 @@ package controllers_test
 
 import (
 	"context"
+	"testing"
+
 	ddv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
-
-	"github.com/wantedly/deployment-duplicator/controllers"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
+	"github.com/wantedly/deployment-duplicator/controllers"
 	ut "github.com/wantedly/deployment-duplicator/controllers/testing"
-	"testing"
 )
 
 type testcase struct {
