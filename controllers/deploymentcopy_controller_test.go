@@ -50,7 +50,7 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 			},
 		},
 		{
-			name:        "one deployment one deployment copy",
+			name:        "one deployment and one deployment copy",
 			explanation: "should make a copy",
 			initialState: []runtime.Object{
 				ut.GenDeployment("some-deployment", map[string]string{"app": "some-app", "role": "web"}, ut.AddContainer("some-container", "some-image-tag")),
