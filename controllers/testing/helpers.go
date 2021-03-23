@@ -55,6 +55,17 @@ func AddContainer(name, image string) deploymentOption {
 		d.Spec.Template.Spec.Containers = append(d.Spec.Template.Spec.Containers, v1.Container{Name: name, Image: image})
 	}
 }
+
+func AddAnnotation(key, value string) deploymentOption {
+	return func(d *appsv1.Deployment) {
+		if d.ObjectMeta.Annotations == nil {
+			d.ObjectMeta.Annotations = map[string]string{key: value}
+			return
+		}
+		d.ObjectMeta.Annotations[key] = value
+	}
+}
+
 func GenDeploymentCopy(name string, targetDeployment string, opts ...deploymentCopyOption) *ddv1beta1.DeploymentCopy {
 	dc := &ddv1beta1.DeploymentCopy{
 		TypeMeta: metav1.TypeMeta{
