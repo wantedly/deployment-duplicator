@@ -52,9 +52,6 @@ func GenDeployment(name string, labels map[string]string, opts ...deploymentOpti
 
 func AddContainer(name, image string) deploymentOption {
 	return func(d *appsv1.Deployment) {
-		if d.Spec.Template.Spec.Containers == nil {
-			d.Spec.Template.Spec.Containers = []v1.Container{}
-		}
 		d.Spec.Template.Spec.Containers = append(d.Spec.Template.Spec.Containers, v1.Container{Name: name, Image: image})
 	}
 }
@@ -80,9 +77,6 @@ func GenDeploymentCopy(name string, targetDeployment string, opts ...deploymentC
 }
 func AddTargetContainer(name, image string) deploymentCopyOption {
 	return func(dc *ddv1beta1.DeploymentCopy) {
-		if dc.Spec.TargetContainers == nil {
-			dc.Spec.TargetContainers = []ddv1beta1.Container{}
-		}
 		dc.Spec.TargetContainers = append(dc.Spec.TargetContainers, ddv1beta1.Container{
 			Name:  name,
 			Image: image,
