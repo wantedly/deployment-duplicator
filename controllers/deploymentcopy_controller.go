@@ -21,15 +21,18 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	appsv1 "k8s.io/api/apps/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
+	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 
 	duplicationv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
@@ -54,7 +57,7 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	instance := &duplicationv1beta1.DeploymentCopy{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
@@ -67,7 +70,7 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	// TODO(munisystem): Set a status into the DeploymentCopy resource if the target deployment doesn't exist
 	target, err := r.getDeployment(instance.Spec.TargetDeploymentName, instance.Namespace)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
@@ -126,21 +129,18 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 			Labels:      labels,
 			Annotations: annotations,
 		},
-		Spec: spec,
 	}
 
 	if err := controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme); err != nil {
 		return reconcile.Result{}, err
 	}
-	_, err = r.getDeployment(copiedDeploy.Name, copiedDeploy.Namespace)
-	if err != nil && errors.IsNotFound(err) {
-		log.Info("Creating copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
-		err = r.Create(context.TODO(), copiedDeploy)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-	} else if err != nil {
-		return reconcile.Result{}, err
+
+	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
+	if _, err := util.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
+		copiedDeploy.Spec = spec
+		return nil
+	}); err != nil {
+		return ctrl.Result{}, errors.WithStack(err)
 	}
 
 	return reconcile.Result{}, nil
