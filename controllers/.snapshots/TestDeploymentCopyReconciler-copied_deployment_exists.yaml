@@ -59,6 +59,14 @@ items:
       role: web
     name: some-deployment-some-deployment-copy
     namespace: some-namespace
+    ownerReferences:
+    - apiVersion: duplication.k8s.wantedly.com/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentCopy
+      name: some-deployment-copy
+      uid: ""
+    resourceVersion: "1"
   spec:
     selector:
       matchLabels:
@@ -73,7 +81,7 @@ items:
           role: web
       spec:
         containers:
-        - image: other-image-tag
+        - image: another-image-tag
           name: some-container
           resources: {}
   status: {}
