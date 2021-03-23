@@ -17,6 +17,7 @@ all: manager
 # Since we are using `cupaloy` to do snapshot test,
 # you can run `UPDATE_SNAPSHOTS=true make test` to update the snapshot file
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+SHELL=/bin/bash
 test: generate fmt vet manifests
 	echo ${SHELL}
 	mkdir -p ${ENVTEST_ASSETS_DIR}
