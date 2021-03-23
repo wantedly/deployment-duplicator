@@ -14,6 +14,9 @@ endif
 all: manager
 
 # Run tests
+# Since we are using `cupaloy` to do snapshot test,
+# you can run `UPDATE_SNAPSHOTS=true make test` to update the snapshot file
+ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: generate fmt vet manifests
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0-alpha.6/hack/setup-envtest.sh
