@@ -9,6 +9,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: run test
-        run: make test
+        run: SHELL=/bin/bash make test
 
 
