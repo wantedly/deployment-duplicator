@@ -66,6 +66,14 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 				ut.GenDeploymentCopy("some-deployment-copy", "some-deployment", ut.AddTargetContainer("some-container", "another-image-tag")),
 			},
 		},
+		{
+			name:        "labels and annotations are respected",
+			explanation: "copied deployments are respected source labels and annotations",
+			initialState: []runtime.Object{
+				ut.GenDeployment("some-deployment", map[string]string{"app": "some-app", "role": "web"}, ut.AddContainer("some-container", "some-image-tag"), ut.AddAnnotation("some-annotation", "some-value")),
+				ut.GenDeploymentCopy("some-deployment-copy", "some-deployment", ut.AddTargetContainer("some-container", "another-image-tag")),
+			},
+		},
 	}
 
 	for _, tc := range testcases {
