@@ -55,6 +55,17 @@ func AddContainer(name, image string) deploymentOption {
 		d.Spec.Template.Spec.Containers = append(d.Spec.Template.Spec.Containers, v1.Container{Name: name, Image: image})
 	}
 }
+
+func AddAnnotation(key, value string) deploymentOption {
+	return func(d *appsv1.Deployment) {
+		if d.ObjectMeta.Annotations == nil {
+			d.ObjectMeta.Annotations = map[string]string{key: value}
+			return
+		}
+		d.ObjectMeta.Annotations[key] = value
+	}
+}
+
 func GenDeploymentCopy(name string, targetDeployment string, opts ...deploymentCopyOption) *ddv1beta1.DeploymentCopy {
 	dc := &ddv1beta1.DeploymentCopy{
 		TypeMeta: metav1.TypeMeta{
@@ -82,6 +93,24 @@ func AddTargetContainer(name, image string) deploymentCopyOption {
 			Image: image,
 			Env:   nil,
 		})
+	}
+}
+func AddCustomLabel(key, value string) deploymentCopyOption {
+	return func(dc *ddv1beta1.DeploymentCopy) {
+		if dc.Spec.CustomLabels == nil {
+			dc.Spec.CustomLabels = map[string]string{key: value}
+			return
+		}
+		dc.Spec.CustomLabels[key] = value
+	}
+}
+func AddCustomAnnotation(key, value string) deploymentCopyOption {
+	return func(dc *ddv1beta1.DeploymentCopy) {
+		if dc.Spec.CustomAnnotations == nil {
+			dc.Spec.CustomAnnotations = map[string]string{key: value}
+			return
+		}
+		dc.Spec.CustomAnnotations[key] = value
 	}
 }
 
