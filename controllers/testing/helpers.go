@@ -95,6 +95,24 @@ func AddTargetContainer(name, image string) deploymentCopyOption {
 		})
 	}
 }
+func AddCustomLabel(key, value string) deploymentCopyOption {
+	return func(dc *ddv1beta1.DeploymentCopy) {
+		if dc.Spec.CustomLabels == nil {
+			dc.Spec.CustomLabels = map[string]string{key: value}
+			return
+		}
+		dc.Spec.CustomLabels[key] = value
+	}
+}
+func AddCustomAnnotation(key, value string) deploymentCopyOption {
+	return func(dc *ddv1beta1.DeploymentCopy) {
+		if dc.Spec.CustomAnnotations == nil {
+			dc.Spec.CustomAnnotations = map[string]string{key: value}
+			return
+		}
+		dc.Spec.CustomAnnotations[key] = value
+	}
+}
 
 func SnapshotYaml(t *testing.T, objs ...interface{}) {
 	t.Helper()
