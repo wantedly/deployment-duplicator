@@ -125,8 +125,6 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
 			Namespace:   instance.Namespace,
-			Labels:      labels,
-			Annotations: annotations,
 		},
 	}
 
@@ -136,6 +134,8 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 
 	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
 	if _, err := util.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
+		copiedDeploy.Labels = labels
+		copiedDeploy.Annotations = annotations
 		copiedDeploy.Spec = spec
 		return nil
 	}); err != nil {
