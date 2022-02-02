@@ -5,7 +5,7 @@
 Deployment Duplicator provides a Custom Resource and Controller to duplicate Deployments.
 
 
-## Concept
+## Use cases
 
 Deployment duplication is useful for testing, including canary testing in production and debug in development.
 
@@ -25,6 +25,13 @@ Additionally, Deployment Duplicator can put some metadata to a generated Deploym
 * Attach `canary: true` to Deployment's labels
 * Give a name the host of Pod to `canary`
 * Add `CANARY_ENABLED: 1` to environment variables of all containers
+
+### `kubefork`
+
+At Wantedly, we also use this project as a component of the `kubefork` tool:
+it duplicates deployments selectively to be able to develop a service in an environment close to QA without copying the whole cluster.
+
+Read more about it in the introduction article: [マイクロサービスでもポチポチ確認するための Kubefork](https://www.wantedly.com/companies/wantedly/post_articles/313884) (in Japanese)
 
 ## Installation
 
