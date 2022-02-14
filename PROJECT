@@ -1,0 +1,6 @@
+domain: k8s.wantedly.com
+layout:
+- go.kubebuilder.io/v3
+projectName: deployment-duplicator
+repo: github.com/wantedly/deployment-duplicator
+version: "3"
