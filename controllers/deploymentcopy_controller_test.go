@@ -104,7 +104,7 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 				Name:      "some-deployment-copy",
 			}
 			req := ctrl.Request{NamespacedName: nn}
-			if _, err := rec.Reconcile(req); err != nil {
+			if _, err := rec.Reconcile(ctx, req); err != nil {
 				t.Fatalf("%+v", err)
 			}
 
