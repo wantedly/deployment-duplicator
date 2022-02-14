@@ -1,0 +1,29 @@
+---
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+items:
+  - apiVersion: duplication.k8s.wantedly.com/v1beta1
+    kind: DeploymentCopy
+    metadata:
+      creationTimestamp: null
+      name: some-deployment-copy
+      namespace: some-namespace
+      resourceVersion: "999"
+    spec:
+      hostname: ""
+      nameSuffix: ""
+      replicas: 0
+      targetContainers:
+        - env: null
+          image: some-image-tag
+          name: some-container
+      targetDeploymentName: some-deployment
+    status: {}
+kind: DeploymentCopyList
+metadata: {}
+
+---
+apiVersion: apps/v1
+items: null
+kind: DeploymentList
+metadata: {}
+
