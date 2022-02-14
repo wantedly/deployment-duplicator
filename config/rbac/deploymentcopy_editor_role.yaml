@@ -1,0 +1,24 @@
+# permissions for end users to edit deploymentcopies.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deploymentcopy-editor-role
+rules:
+- apiGroups:
+  - duplication.k8s.wantedly.com
+  resources:
+  - deploymentcopies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - duplication.k8s.wantedly.com
+  resources:
+  - deploymentcopies/status
+  verbs:
+  - get

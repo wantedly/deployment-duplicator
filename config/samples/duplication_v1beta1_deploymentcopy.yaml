@@ -1,0 +1,6 @@
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+kind: DeploymentCopy
+metadata:
+  name: deploymentcopy-sample
+spec:
+  # TODO(user): Add fields here
