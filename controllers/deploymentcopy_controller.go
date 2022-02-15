@@ -137,16 +137,14 @@ func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		},
 	}
 
-	if err := controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme); err != nil {
-		return reconcile.Result{}, err
-	}
-
 	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
 	if _, err := controllerutil.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
 		copiedDeploy.Labels = labels
 		copiedDeploy.Annotations = annotations
 		copiedDeploy.Spec = spec
-		return nil
+
+		// In order to support Update, set controller reference here
+		return controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme)
 	}); err != nil {
 		return ctrl.Result{}, errors.WithStack(err)
 	}
