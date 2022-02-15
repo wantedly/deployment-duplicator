@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/wantedly/deployment-duplicator/controllers"
@@ -104,11 +105,11 @@ func TestDeploymentCopyReconciler(t *testing.T) {
 				Name:      "some-deployment-copy",
 			}
 			req := ctrl.Request{NamespacedName: nn}
-			if _, err := rec.Reconcile(req); err != nil {
+			if _, err := rec.Reconcile(ctx, req); err != nil {
 				t.Fatalf("%+v", err)
 			}
 
-			lists := []runtime.Object{
+			lists := []ctrlclient.ObjectList{
 				&ddv1beta1.DeploymentCopyList{},
 				&appsv1.DeploymentList{},
 			}

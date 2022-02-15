@@ -1,4 +1,3 @@
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -38,6 +37,12 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - duplication.k8s.wantedly.com
+  resources:
+  - deploymentcopies/finalizers
+  verbs:
+  - update
 - apiGroups:
   - duplication.k8s.wantedly.com
   resources:

@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Wantedly, Inc..
+Copyright 2022 Wantedly, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,20 +19,19 @@ package controllers
 import (
 	"context"
 	"fmt"
-
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	util "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	duplicationv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
 )
@@ -46,12 +45,22 @@ type DeploymentCopyReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=duplication.k8s.wantedly.com,resources=deploymentcopies/finalizers,verbs=update
 
-func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+// Reconcile is part of the main kubernetes reconciliation loop which aims to
+// move the current state of the cluster closer to the desired state.
+// TODO(user): Modify the Reconcile function to compare the state specified by
+// the DeploymentCopy object against the actual cluster state, and then
+// perform operations to make the cluster state reflect the state specified by
+// the user.
+//
+// For more details, check Reconcile and its Result here:
+// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
+func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// Fetch the DeploymentCopy instance
 	instance := &duplicationv1beta1.DeploymentCopy{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
@@ -123,21 +132,19 @@ func (r *DeploymentCopyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 	}
 	copiedDeploy := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
-			Namespace:   instance.Namespace,
+			Name:      fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
+			Namespace: instance.Namespace,
 		},
 	}
 
-	if err := controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme); err != nil {
-		return reconcile.Result{}, err
-	}
-
 	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
-	if _, err := util.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
+	if _, err := controllerutil.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
 		copiedDeploy.Labels = labels
 		copiedDeploy.Annotations = annotations
 		copiedDeploy.Spec = spec
-		return nil
+
+		// In order to support Update, set controller reference here
+		return controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme)
 	}); err != nil {
 		return ctrl.Result{}, errors.WithStack(err)
 	}
@@ -151,6 +158,7 @@ func (r *DeploymentCopyReconciler) getDeployment(name, namespace string) (*appsv
 	return found, err
 }
 
+// SetupWithManager sets up the controller with the Manager.
 func (r *DeploymentCopyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&duplicationv1beta1.DeploymentCopy{}).

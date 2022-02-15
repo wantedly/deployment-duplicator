@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Wantedly, Inc..
+Copyright 2022 Wantedly, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -65,7 +65,8 @@ type DeploymentCopyStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
 
 // DeploymentCopy is the Schema for the deploymentcopies API
 type DeploymentCopy struct {
@@ -76,7 +77,7 @@ type DeploymentCopy struct {
 	Status DeploymentCopyStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
 
 // DeploymentCopyList contains a list of DeploymentCopy
 type DeploymentCopyList struct {

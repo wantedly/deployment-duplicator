@@ -1,7 +1,16 @@
 domain: k8s.wantedly.com
+layout:
+- go.kubebuilder.io/v3
+projectName: deployment-duplicator
 repo: github.com/wantedly/deployment-duplicator
 resources:
-- group: duplication
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: k8s.wantedly.com
+  group: duplication
   kind: DeploymentCopy
+  path: github.com/wantedly/deployment-duplicator/api/v1beta1
   version: v1beta1
-version: "2"
+version: "3"
