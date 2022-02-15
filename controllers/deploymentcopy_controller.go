@@ -63,7 +63,7 @@ type DeploymentCopyReconciler struct {
 func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// Fetch the DeploymentCopy instance
 	instance := &duplicationv1beta1.DeploymentCopy{}
-	err := r.Get(context.TODO(), req.NamespacedName, instance)
+	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
@@ -76,7 +76,7 @@ func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	// TODO(munisystem): Set a status into the DeploymentCopy resource if the target deployment doesn't exist
-	target, err := r.getDeployment(instance.Spec.TargetDeploymentName, instance.Namespace)
+	target, err := r.getDeployment(ctx, instance.Spec.TargetDeploymentName, instance.Namespace)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
@@ -138,7 +138,7 @@ func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
-	if _, err := controllerutil.CreateOrUpdate(context.TODO(), r.Client, copiedDeploy, func() error {
+	if _, err := controllerutil.CreateOrUpdate(ctx, r.Client, copiedDeploy, func() error {
 		copiedDeploy.Labels = labels
 		copiedDeploy.Annotations = annotations
 		copiedDeploy.Spec = spec
@@ -152,9 +152,9 @@ func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	return reconcile.Result{}, nil
 }
 
-func (r *DeploymentCopyReconciler) getDeployment(name, namespace string) (*appsv1.Deployment, error) {
+func (r *DeploymentCopyReconciler) getDeployment(ctx context.Context, name, namespace string) (*appsv1.Deployment, error) {
 	found := &appsv1.Deployment{}
-	err := r.Get(context.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, found)
+	err := r.Get(ctx, types.NamespacedName{Name: name, Namespace: namespace}, found)
 	return found, err
 }
 
