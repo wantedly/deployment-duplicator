@@ -52,9 +52,7 @@ items:
               name: some-container
               resources: {}
     status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
+  - metadata:
       creationTimestamp: null
       labels:
         app: some-app

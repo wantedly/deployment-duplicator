@@ -25,7 +25,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -34,6 +33,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	duplicationv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
+	refresh "github.com/wantedly/resource-refresher"
 )
 
 var log = logf.Log.WithName("controller")
@@ -53,10 +53,6 @@ type DeploymentCopyReconciler struct {
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the DeploymentCopy object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
@@ -130,23 +126,29 @@ func (r *DeploymentCopyReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			)
 		}
 	}
+
 	copiedDeploy := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
-			Namespace: instance.Namespace,
+			Name:        fmt.Sprintf("%s-%s", copied.ObjectMeta.Name, instance.Spec.NameSuffix),
+			Namespace:   instance.Namespace,
+			Labels:      labels,
+			Annotations: annotations,
+		},
+		Spec: spec,
+	}
+
+	copiedDeployList := refresh.ObjectList{
+		Items:            []client.Object{copiedDeploy},
+		GroupVersionKind: appsv1.SchemeGroupVersion.WithKind("Deployment"),
+		Identity: func(obj client.Object) (string, error) {
+			return obj.GetName(), nil
 		},
 	}
 
 	log.Info("try to create or update copied Deployment", "namespace", copiedDeploy.Namespace, "name", copiedDeploy.Name)
-	if _, err := controllerutil.CreateOrUpdate(ctx, r.Client, copiedDeploy, func() error {
-		copiedDeploy.Labels = labels
-		copiedDeploy.Annotations = annotations
-		copiedDeploy.Spec = spec
-
-		// In order to support Update, set controller reference here
-		return controllerutil.SetControllerReference(instance, copiedDeploy, r.Scheme)
-	}); err != nil {
-		return ctrl.Result{}, errors.WithStack(err)
+	ref := refresh.New(r.Client, r.Scheme)
+	if err := ref.Refresh(ctx, instance, copiedDeployList); err != nil {
+		return reconcile.Result{}, errors.WithStack(err)
 	}
 
 	return reconcile.Result{}, nil
