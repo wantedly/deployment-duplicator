@@ -164,5 +164,6 @@ func (r *DeploymentCopyReconciler) getDeployment(ctx context.Context, name, name
 func (r *DeploymentCopyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&duplicationv1beta1.DeploymentCopy{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }
